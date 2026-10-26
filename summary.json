@@ -1,0 +1,53 @@
+{
+  "cancel_invoices": 3836,
+  "total_invoices": 25900,
+  "cancel_value": 896812.49,
+  "revenue_clean": 10246820.870000001,
+  "missing_customer_share_rev": 0.14732308187602774,
+  "missing_customer_share_rows": 0.25139329076906586,
+  "cancel_value_pct_of_rev": 0.08752104690593658,
+  "cancel_invoice_share": 0.14810810810810812,
+  "peak_month": "2011-11",
+  "peak_month_rev": 1452112.69,
+  "sep_oct_avg": 1065812.38,
+  "nov_2011": 1452112.69,
+  "spring_avg": 613190.26,
+  "uk_share": 0.8513904293517722,
+  "top_non_uk": {
+    "Netherlands": 283889.34,
+    "EIRE": 270850.86,
+    "Germany": 205381.15,
+    "France": 184493.0,
+    "Australia": 138103.81
+  },
+  "customers": 4334,
+  "repeat_rate": 0.6527457314259345,
+  "top20_share": 0.7458140577873279,
+  "segments": {
+    "Champions": {
+      "pct_customers": 26.2,
+      "pct_revenue": 66.7,
+      "customers": 1136
+    },
+    "Others": {
+      "pct_customers": 60.1,
+      "pct_revenue": 26.4,
+      "customers": 2606
+    },
+    "At risk (were frequent)": {
+      "pct_customers": 6.3,
+      "pct_revenue": 5.3,
+      "customers": 273
+    },
+    "Recent, low frequency": {
+      "pct_customers": 7.4,
+      "pct_revenue": 1.6,
+      "customers": 319
+    }
+  },
+  "m1_retention_avg": 21.272392940287574,
+  "m3_retention_avg": 24.577857766492894,
+  "dec10_cohort_size": 884,
+  "dec10_m1": 36.53846153846153,
+  "dec10_m11": 50.2262443438914
+}

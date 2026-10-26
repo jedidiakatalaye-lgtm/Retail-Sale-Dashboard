@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Retail Sales Dashboard</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f7f9;--card:#fff;--text:#1b2430;--muted:#667085;--accent:#2f6fde;--soft:#c9d3e3;--line:#e4e7ec;--warn:#b8bfcc;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12161c;--card:#1b222b;--text:#e8ecf2;--muted:#9aa5b5;--accent:#6ea0ff;--soft:#3a475a;--line:#2a3340;--warn:#4a5568;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12161c;--card:#1b222b;--text:#e8ecf2;--muted:#9aa5b5;--accent:#6ea0ff;--soft:#3a475a;--line:#2a3340;--warn:#4a5568;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:920px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:22px;margin:0 0 2px}.sub{color:var(--muted);margin:0 0 16px;font-size:13px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.kpi b{display:block;font-size:24px}.kpi span{color:var(--muted);font-size:12px}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button{border:1px solid var(--line);background:var(--card);color:var(--text);padding:8px 14px;border-radius:999px;font:inherit;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.so{border-left:3px solid var(--accent);padding:4px 12px;margin:0 0 12px;font-weight:600}
+h2{font-size:14px;margin:0 0 8px;color:var(--muted);font-weight:600}
+.read{min-height:22px;font-size:13px;color:var(--muted);margin:4px 0 8px}
+.scroll{overflow-x:auto}svg{width:100%;height:auto;display:block}
+.bar{cursor:pointer;fill:var(--accent)}.bar.part{fill:var(--warn)}.bar:hover,.bar.on{opacity:.75}
+.row{display:grid;grid-template-columns:130px 1fr 64px;gap:8px;align-items:center;margin:7px 0;font-size:13px}
+.track{background:var(--line);border-radius:4px;height:14px;position:relative}
+.fill{height:100%;border-radius:4px;background:var(--accent)}.fill.g{background:var(--soft);position:absolute;top:0;left:0}
+.leg{font-size:12px;color:var(--muted);margin-top:6px}
+.hm{display:grid;grid-template-columns:62px repeat(13,minmax(34px,1fr));gap:2px;font-size:11px;min-width:560px}
+.hm div{padding:5px 0;text-align:center;border-radius:3px}.hm .l{text-align:left;color:var(--muted)}
+.grid2{display:grid;gap:12px}@media(min-width:760px){.grid2{grid-template-columns:1fr 1fr}}
+footer{margin-top:18px;color:var(--muted);font-size:12px}[hidden]{display:none}
+</style></head><body><main>
+<h1>Retail Sales Dashboard</h1>
+<p class="sub">UK online gift retailer · 1 Dec 2010 – 9 Dec 2011 · real transactions (UCI Online Retail)</p>
+<div class="kpis" id="kpis"></div>
+<div class="tabs" role="tablist" id="tabs"></div>
+<section id="revenue"></section><section id="customers" hidden></section><section id="retention" hidden></section>
+<footer>Revenue = quantity × unit price, after cleaning (cancellations, fees and duplicates removed). December 2011 is a partial month. Customer figures cover rows with a customer ID only. Full method: see the case study repo.</footer>
+</main>
+<script>
+const D={"kpis": [["Revenue (cleaned)", "\u00a310.2M"], ["Customers identified", "4,334"], ["Repeat-purchase rate", "65%"], ["Invoices cancelled/returned", "15%"]], "monthly": [["Dec 10", 775572, false], ["Jan 11", 670362, false], ["Feb 11", 507783, false], ["Mar 11", 689708, false], ["Apr 11", 515355, false], ["May 11", 739914, false], ["Jun 11", 737559, false], ["Jul 11", 688145, false], ["Aug 11", 724197, false], ["Sep 11", 1028314, false], ["Oct 11", 1103311, false], ["Nov 11", 1452113, false], ["Dec 11", 614488, true]], "uk": 85, "countries": [["Netherlands", 283889], ["EIRE", 270851], ["Germany", 205381], ["France", 184493], ["Australia", 138104]], "segs": [["Champions", 26.2, 66.7, 1136], ["Others", 60.1, 26.4, 2606], ["At risk (were frequent)", 6.3, 5.3, 273], ["Recent, low frequency", 7.4, 1.6, 319]], "cohorts": ["2010-12", "2011-01", "2011-02", "2011-03", "2011-04", "2011-05", "2011-06", "2011-07", "2011-08", "2011-09", "2011-10", "2011-11", "2011-12"], "ret": [[100.0, 36.5, 32.4, 38.3, 36.2, 39.8, 36.2, 34.8, 35.3, 39.5, 37.3, 50.2, null], [100.0, 21.9, 26.7, 22.8, 31.7, 28.8, 24.8, 24.0, 29.6, 32.7, 36.5, null, null], [100.0, 18.7, 18.7, 28.7, 27.1, 24.5, 25.5, 27.4, 24.7, 30.5, null, null, null], [100.0, 14.8, 25.2, 19.9, 22.3, 16.8, 26.8, 23.0, 27.9, null, null, null, null], [100.0, 21.0, 20.3, 21.0, 19.7, 22.7, 21.7, 26.0, null, null, null, null, null], [100.0, 19.0, 17.3, 17.3, 20.8, 23.2, 26.4, null, null, null, null, null, null], [100.0, 17.4, 15.7, 26.4, 23.1, 33.1, null, null, null, null, null, null, null], [100.0, 17.6, 20.3, 22.5, 27.3, null, null, null, null, null, null, null, null], [100.0, 20.1, 24.3, 24.3, null, null, null, null, null, null, null, null, null], [100.0, 23.4, 30.1, null, null, null, null, null, null, null, null, null, null], [100.0, 23.5, null, null, null, null, null, null, null, null, null, null, null], [100.0, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null]], "so": {"revenue": "November is the peak: about 2.4\u00d7 the spring average. Plan stock and cash for Sep\u2013Nov.", "customers": "26% of customers (Champions) bring 67% of revenue. Protect them.", "retention": "About 1 in 5 customers buys again the next month. The Dec 2010 cohort is the most loyal, with 30\u201350% still ordering most months."}};
+const $=s=>document.querySelector(s);
+const money=n=>n>=1e6?"£"+(n/1e6).toFixed(2)+"M":"£"+Math.round(n/1e3)+"k";
+$("#kpis").innerHTML=D.kpis.map(k=>`<div class="card kpi"><b>${k[1]}</b><span>${k[0]}</span></div>`).join("");
+const TABS=[["revenue","Revenue"],["customers","Customers"],["retention","Retention"]];
+$("#tabs").innerHTML=TABS.map((t,i)=>`<button role="tab" data-t="${t[0]}" aria-selected="${i==0}">${t[1]}</button>`).join("");
+$("#tabs").onclick=e=>{const t=e.target.dataset.t;if(!t)return;
+ TABS.forEach(x=>{$("#"+x[0]).hidden=x[0]!=t});
+ document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.t==t))};
+// Revenue
+const M=D.monthly,mx=Math.max(...M.map(m=>m[1])),W=640,H=250,bw=W/M.length;
+const bars=M.map((m,i)=>{const h=m[1]/mx*(H-40);return `<rect class="bar${m[2]?" part":""}" data-i="${i}" x="${i*bw+6}" y="${H-24-h}" width="${bw-12}" height="${h}" rx="3"/><text x="${i*bw+bw/2}" y="${H-8}" text-anchor="middle" font-size="10" fill="var(--muted)">${m[0]}</text>`}).join("");
+$("#revenue").innerHTML=`<p class="so">${D.so.revenue}</p><div class="card"><h2>Monthly revenue (tap a bar)</h2><div class="read" id="r1">Tap a bar to see the month’s revenue.</div><div class="scroll"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Monthly revenue bar chart" style="min-width:520px">${bars}</svg></div><div class="leg">Grey bar = partial month.</div></div>
+<div class="card" style="margin-top:12px"><h2>Top 5 markets outside the UK (the UK is ${D.uk}% of revenue)</h2>${D.countries.map(c=>`<div class="row"><span>${c[0]}</span><div class="track"><div class="fill" style="width:${c[1]/D.countries[0][1]*100}%"></div></div><b>${money(c[1])}</b></div>`).join("")}</div>`;
+$("#revenue svg").onclick=e=>{const r=e.target.closest(".bar");if(!r)return;const m=M[r.dataset.i];
+ document.querySelectorAll(".bar").forEach(b=>b.classList.remove("on"));r.classList.add("on");
+ $("#r1").textContent=m[0]+": "+money(m[1])+(m[2]?" (partial month)":"")};
+// Customers
+$("#customers").innerHTML=`<p class="so">${D.so.customers}</p><div class="card"><h2>Customer segments: share of customers vs share of revenue</h2>${D.segs.map(s=>`<div class="row"><span>${s[0]}<br><small style="color:var(--muted)">${s[3].toLocaleString()} customers</small></span><div class="track"><div class="fill g" style="width:${s[1]}%"></div><div class="fill" style="width:${s[2]}%;height:6px;top:4px;position:absolute"></div></div><b>${s[2]}%</b></div>`).join("")}<div class="leg">Light bar = % of customers · Dark bar = % of revenue (value shown).</div></div>
+<div class="card" style="margin-top:12px"><h2>How to read the segments</h2><p style="margin:0;font-size:13px"><b>Champions</b>: bought recently and often. <b>At risk</b>: used to buy often, silent recently (win-back targets). <b>Recent, low frequency</b>: new or occasional buyers. Scores are quintile-based (RFM).</p></div>`;
+// Retention
+const hm=["<div class='l'>Cohort</div>"+Array.from({length:13},(_,j)=>`<div class="l" style="text-align:center">M${j}</div>`).join("")];
+D.ret.forEach((r,i)=>{hm.push(`<div class="l">${D.cohorts[i]}</div>`);r.forEach(v=>{hm.push(v===null?"<div></div>":`<div style="background:color-mix(in srgb,var(--accent) ${Math.min(v*2,100)}%,transparent);color:${v>28?"#fff":"var(--text)"}">${Math.round(v)}</div>`)})});
+$("#retention").innerHTML=`<p class="so">${D.so.retention}</p><div class="card"><h2>% of each cohort that ordered again, by months since first purchase</h2><div class="scroll"><div class="hm">${hm.join("")}</div></div><div class="leg">Cohort = month of first purchase. Dec 2011 cells hidden (partial month).</div></div>`;
+</script></body></html>

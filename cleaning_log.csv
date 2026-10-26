@@ -1,0 +1,6 @@
+step,rows_after
+Raw rows,541909
+Remove cancellation invoices (start with 'C'),532621
+"Remove non-product codes (postage, fees, manual, etc.)",530210
+Remove zero/negative quantity or price,527725
+Remove exact duplicate rows,522504
